@@ -26,7 +26,7 @@ app.use((req, res, next) => {
 
 const routerUsers = require("./routes/users");
 const routerCards = require("./routes/cards");
-const { login, createUser } = require("../controllers/users");
+const { login, createUser } = require("./controllers/users");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
