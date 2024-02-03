@@ -1,0 +1,13 @@
+.profile__edit {
+    margin: 0;
+    display: flex;
+    gap: 18px;
+    align-items: center;
+}
+
+@media all and (max-width: 900px) {
+  .profile__edit {
+    gap: 10px;
+    justify-content: center;
+  }
+}

@@ -1,0 +1,10 @@
+.header__menu {
+    display: flex;
+    align-items: center;
+}
+
+@media all and (max-width: 900px) {
+    .header__menu {
+        flex-direction: column-reverse;
+    }
+  }

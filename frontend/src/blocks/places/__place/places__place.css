@@ -1,0 +1,12 @@
+.places__place {
+  display: flex;
+  justify-content: space-between;
+  margin: 25px 15px 31px 21px;
+  align-items: center;
+}
+
+@media all and (max-width: 900px) {
+  .places__place {
+    margin: 25px 15px 21px 21px;
+  }
+}
