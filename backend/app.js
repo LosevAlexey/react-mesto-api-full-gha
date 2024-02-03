@@ -5,23 +5,18 @@ const { celebrate, Joi } = require('celebrate');
 const { errors } = require('celebrate');
 const auth = require('./middlewares/auth');
 
+require('dotenv').config();
+
+const regex = /^(http|https):\/\/(?:www\.)?[a-zA-Z0-9._~\-:?#[\]@!$&'()*+,\/;=]{2,256}\.[a-zA-Z0-9.\/?#-]{2,}$/;
+
 // Слушаем 3000 порт
 const { PORT = 3000 } = process.env;
 
 const app = express();
 
-app.use(auth);
-app.use(errors());
 // подключаемся к серверу mongo
 mongoose.connect("mongodb://localhost:27017/mestodb", {
   useNewUrlParser: true,
-});
-
-app.use((req, res, next) => {
-  req.user = {
-    _id: "", // вставьте сюда _id созданного в предыдущем пункте пользователя
-  };
-  next();
 });
 
 const routerUsers = require("./routes/users");
@@ -42,11 +37,13 @@ app.post('/signup', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().regex(/https?:\/\/(www)?(\.)?[0-9а-яa-zё]{1,}\.[а-яa-zё]{2}[a-zа-яё\-._~:/?#[\]@!$&'()*+,;=]*#?/i),
+    avatar: Joi.string().regex(regex),
     email: Joi.string().email().required(),
     password: Joi.string().required(),
   }),
 }), createUser);
+
+app.use(auth);
 
 app.use("/users", routerUsers);
 app.use("/cards", routerCards);
@@ -54,6 +51,8 @@ app.use("/cards", routerCards);
 app.use('*', (req, res, next) => {
   next(new NotFoundError("Запрашиваемый ресурс не найден"));
 });
+
+app.use(errors());
 
 app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;

@@ -7,6 +7,8 @@ const CastError = require("../constants/CastError");
 const ConflictError = require("../constants/ConflictError");
 const AuthError = require("../constants/AuthError");
 
+const { NODE_ENV, JWT_SECRET } = process.env;
+
 module.exports.getAllUsers = (req, res, next) => {
   User.find({})
     .then((result) => res.send(result))
@@ -35,7 +37,7 @@ module.exports.createUser = (req, res, next) => {
   const { name, about, avatar, email, password } = req.body;
   bcrypt.hash(password, 10)
     .then((hash) => User.create({ name, about, avatar, email, password: hash }))
-    .then((user) => res.status(201).send({ data: user }))
+    .then(() => res.status(201).send({ name, about, avatar, email, }))
     .catch((err) => {
       if (err.name === "ValidationError") {
         next(new CastError("Переданы некорректные данные"));
@@ -99,8 +101,8 @@ module.exports.login = (req, res, next) => {
     .then((user) => {
       const token = jwt.sign(
         { _id: user._id },
-        'some-secret-key',
-        { expiresIn: '7d' },
+        NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+         { expiresIn: '7d'},
       );
       res.send({ token });
     })
