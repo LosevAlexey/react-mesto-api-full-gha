@@ -97,7 +97,7 @@ module.exports.updateUserAvatar = (req, res, next) => {
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
-  User.findOne({ email }).select('+password')
+  User.findUserByCredentials({ email }).select('+password')
     .then((user) => {
       const token = jwt.sign(
         { _id: user._id },
