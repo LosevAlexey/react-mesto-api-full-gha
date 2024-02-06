@@ -13,11 +13,3 @@ node_modules
 .DS_Store
 .idea
 .vscode
-
-git rm --cached .env
-
-git rm env.local --cached
-git rm env.staging --cached
-git commit -m "Stopped tracking env.local, and env.staging"
-
-.env
