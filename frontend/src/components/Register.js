@@ -24,15 +24,15 @@ const Register = ({ onRegister }) => {
 
   return (
     <section className="auth">
-      <h2 className="authtitle">Регистрация</h2>
-      <form onSubmit={handleSubmit} className="authform" name="register">
+      <h2 className="auth__title">Регистрация</h2>
+      <form onSubmit={handleSubmit} className="auth__form" name="register">
         <input
           id="email"
           name="email"
           type="email"
           value={userInfo.email}
           onChange={handleChange}
-          className="authinput"
+          className="auth__input"
           placeholder="Почта"
           required
         />
@@ -43,16 +43,16 @@ const Register = ({ onRegister }) => {
           type="password"
           value={userInfo.password}
           onChange={handleChange}
-          className="authinput"
+          className="auth__input"
           placeholder="Пароль"
           required
         />
 
-        <button type="submit" className="authsubmit">
+        <button type="submit" className="auth__submit">
           Зарегистрироваться
         </button>
 
-        <Link to="/sign-in" className="authlink">
+        <Link to="/sign-in" className="auth__link">
           Уже зарегестрированны? Войти
         </Link>
       </form>
