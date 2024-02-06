@@ -5,46 +5,48 @@ class Api {
     this._authorization = options.headers.authorization;
   }
 
+
+
   async getInitialCards() {
-    const res = await fetch(`${this._url}/cards`, {
+    const res = await this.request(`${this._url}/cards`, {
       headers: this._headers,
     });
-    return this._handleResponse(res);
+    return res;
   }
 
   async deletePlace(cardID) {
-    const res = await fetch(`${this._url}/cards/${cardID}`, {
+    const res = await this.request(`${this._url}/cards/${cardID}`, {
       method: "DELETE",
       headers: this._headers,
     });
-    return this._handleResponse(res);
+    return res;
   }
 
   async putLike(cardId) {
-    const res = await fetch(`${this._url}/cards/${cardId}/likes`, {
+    const res = await this.request(`${this._url}/cards/${cardId}/likes`, {
       method: "PUT",
       headers: this._headers,
     });
-    return this._handleResponse(res);
+    return res;
   }
 
   async deleteLike(cardID) {
-    const res = await fetch(`${this._url}/cards/${cardID}/likes`, {
+    const res = await this.request(`${this._url}/cards/${cardID}/likes`, {
       method: "DELETE",
       headers: this._headers,
     });
-    return this._handleResponse(res);
+    return res;
   }
 
   async getUserInfo() {
-    const res = await fetch(`${this._url}/users/me`, {
+    const res = await this.request(`${this._url}/users/me`, {
       headers: this._headers,
     });
-    return this._handleResponse(res);
+    return res;
   }
 
   async changeUserInfo(data) {
-    const res = await fetch(`${this._url}/users/me`, {
+    const res = await this.request(`${this._url}/users/me`, {
       method: "PATCH",
       headers: this._headers,
       body: JSON.stringify({
@@ -52,25 +54,25 @@ class Api {
         about: data.description,
       }),
     });
-    return this._handleResponse(res);
+    return res;
   }
 
   async changeAvatar(avatar) {
-    const res = await fetch(`${this._url}/users/me/avatar`, {
+    const res = await this.request(`${this._url}/users/me/avatar`, {
       method: "PATCH",
       headers: this._headers,
       body: JSON.stringify(avatar),
     });
-    return this._handleResponse(res);
+    return res;
   }
 
   async addCardPlace(data) {
-    const res = await fetch(`${this._url}/cards`, {
+    const res = await this.request(`${this._url}/cards`, {
       method: "POST",
       headers: this._headers,
       body: JSON.stringify(data),
     });
-    return this._handleResponse(res);
+    return res;
   }
 
   _handleResponse(res) {
@@ -81,16 +83,29 @@ class Api {
     // если ошибка, отклоняем промис
     return Promise.reject(`Ошибка: ${res.status}`);
   }
+
+
+
+  request(url, options) {
+    // принимает два аргумента: урл и объект опций, как и `fetch`
+    return fetch(url, {
+      ...options,
+      headers: {
+        ...this._headers,
+        ...options.headers,
+        authorization: `Bearer ${localStorage.getItem("jwt") || ""}`,
+      },
+    }).then(this._handleResponse);
+  }
 }
 
 
 const api = new Api({
   baseUrl: "http://api.alexey.nomoredomainsmonster.ru",
   headers: {
-    authorization: "217ede58-a10f-4670-a309-daf3a817c4aa",
+    authorization: "Bearer " + (localStorage.getItem("jwt") || ""),
     "Content-Type": "application/json",
   },
 });
 
 export default api;
-// другие методы работы с API

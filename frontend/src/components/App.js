@@ -42,21 +42,21 @@ function App() {
   React.useEffect(() => {
     Promise.all([api.getUserInfo(), api.getInitialCards()])
       .then(([userInfo, initialCards]) => {
-        setCurrentUser(userInfo);
+        setCurrentUser(userInfo.data);
         setCards(initialCards);
       })
       .catch((error) => console.error(`Ошибка - ${error}`));
   }, []);
 
   function handleCardLike(card) {
-    const isLiked = card.likes.some((i) => i._id === currentUser._id);
+    const isLiked = card.likes.some((i) => i === currentUser._id);
 
     if (!isLiked) {
       api
         .putLike(card._id)
         .then((newCard) => {
           setCards((state) =>
-            state.map((c) => (c._id === card._id ? newCard : c))
+            state.map((c) => (c._id === card._id ? newCard.data : c))
           );
         })
         .catch((error) => console.error(`Ошибка - ${error}`));
@@ -65,7 +65,7 @@ function App() {
         .deleteLike(card._id)
         .then((newCard) => {
           setCards((state) =>
-            state.map((c) => (c._id === card._id ? newCard : c))
+            state.map((c) => (c._id === card._id ? newCard.data : c))
           );
         })
         .catch((error) => console.error(`Ошибка - ${error}`));
@@ -85,7 +85,7 @@ function App() {
     api
       .changeUserInfo(name, description)
       .then((user) => {
-        setCurrentUser(user);
+        setCurrentUser(user.data);
         closeAllPopups();
       })
       .catch((error) => console.error(`Ошибка - ${error}`));
@@ -105,7 +105,8 @@ function App() {
     api
       .addCardPlace(name, link)
       .then((newCard) => {
-        setCards([newCard, ...cards]);
+        console.log(newCard)
+        setCards([newCard.data, ...cards]);
         closeAllPopups();
       })
       .catch((error) => console.error(`Ошибка - ${error}`));

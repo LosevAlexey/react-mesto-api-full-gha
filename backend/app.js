@@ -1,28 +1,36 @@
-const NotFoundError = require("./constants/NotFoundError");
-const express = require("express");
-const mongoose = require("mongoose");
+require('dotenv').config();
+
+const express = require('express');
+const mongoose = require('mongoose');
 const { celebrate, Joi } = require('celebrate');
 const { errors } = require('celebrate');
+const cors = require('cors');
+const NotFoundError = require('./constants/NotFoundError');
 const auth = require('./middlewares/auth');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
-require('dotenv').config();
-
 const regex = /^(http|https):\/\/(?:www\.)?[a-zA-Z0-9._~\-:?#[\]@!$&'()*+,\/;=]{2,256}\.[a-zA-Z0-9.\/?#-]{2,}$/;
+
+const routerUsers = require('./routes/users');
+const routerCards = require('./routes/cards');
+const { login, createUser } = require('./controllers/users');
+
+mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
+  useNewUrlParser: true,
+});
 
 // Слушаем 3000 порт
 const { PORT = 3000 } = process.env;
 
 const app = express();
 
-// подключаемся к серверу mongo
-mongoose.connect("mongodb://localhost:27017/mestodb", {
-  useNewUrlParser: true,
-});
+app.use(
+  cors({
+    origin: '*',
+  }),
+);
 
-const routerUsers = require("./routes/users");
-const routerCards = require("./routes/cards");
-const { login, createUser } = require("./controllers/users");
+// подключаемся к серверу mongo
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -54,15 +62,14 @@ app.post('/signup', celebrate({
 
 app.use(auth);
 
-app.use("/users", routerUsers);
-app.use("/cards", routerCards);
-
-app.use(errorLogger);
+app.use('/users', routerUsers);
+app.use('/cards', routerCards);
 
 app.use('*', (req, res, next) => {
-  next(new NotFoundError("Запрашиваемый ресурс не найден"));
+  next(new NotFoundError('Запрашиваемый ресурс не найден'));
 });
 
+app.use(errorLogger);
 app.use(errors());
 
 app.use((err, req, res, next) => {

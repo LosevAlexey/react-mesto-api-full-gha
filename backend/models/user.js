@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
-const AuthError = require("../constants/AuthError");
+const bcrypt = require('bcryptjs');
+const AuthError = require('../constants/AuthError');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -24,7 +25,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    validate: [validator.isEmail, 'invalid email'],
+    validate: validator.isEmail,
   },
   password: {
     type: String,

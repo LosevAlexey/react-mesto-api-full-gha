@@ -1,4 +1,5 @@
 export const BASE_URL = "http://api.alexey.nomoredomainsmonster.ru";
+// export const BASE_URL = "http://localhost:3000";
 
 function checkResponse(res) {
   if (res.ok) {

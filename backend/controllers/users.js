@@ -1,11 +1,10 @@
 const bcrypt = require('bcryptjs');
-const User = require("../models/user");
 const jwt = require('jsonwebtoken');
+const User = require('../models/user');
 
-const NotFoundError = require("../constants/NotFoundError");
-const CastError = require("../constants/CastError");
-const ConflictError = require("../constants/ConflictError");
-const AuthError = require("../constants/AuthError");
+const NotFoundError = require('../constants/NotFoundError');
+const CastError = require('../constants/CastError');
+const ConflictError = require('../constants/ConflictError');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
@@ -21,12 +20,12 @@ module.exports.getUserById = (req, res, next) => {
       if (result) {
         res.send(result);
       } else {
-        next(new NotFoundError("Пользователь не найден"));
+        next(new NotFoundError('Пользователь не найден'));
       }
     })
     .catch((err) => {
-      if (err.name === "CastError") {
-        next(new CastError("Некорректный id"));
+      if (err.name === 'CastError') {
+        next(new CastError('Некорректный id'));
       } else {
         next(err);
       }
@@ -34,15 +33,31 @@ module.exports.getUserById = (req, res, next) => {
 };
 
 module.exports.createUser = (req, res, next) => {
-  const { name, about, avatar, email, password } = req.body;
-  bcrypt.hash(password, 10)
-    .then((hash) => User.create({ name, about, avatar, email, password: hash }))
-    .then(() => res.status(201).send({ name, about, avatar, email, }))
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
+
+  bcrypt
+    .hash(password, 10)
+    .then((hash) => User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash,
+    }).then((user) => {
+      res.status(201).send({
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+        _id: user._id,
+      });
+    }))
     .catch((err) => {
-      if (err.name === "ValidationError") {
-        next(new CastError("Переданы некорректные данные"));
+      if (err.name === 'ValidationError') {
+        next(new CastError('Переданы некорректные данные'));
       } else if (err.code === 11000) {
-        next(new ConflictError("Такой e-mail уже зарегистрирован"));
+        next(new ConflictError('Такой e-mail уже зарегистрирован'));
       } else {
         next(err);
       }
@@ -54,18 +69,18 @@ module.exports.updateUser = (req, res, next) => {
   User.findByIdAndUpdate(
     req.user._id,
     { name, about },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   )
     .then((user) => {
       if (user) {
         res.send({ data: user });
       } else {
-        next(new NotFoundError("Пользователь не найден"));
+        next(new NotFoundError('Пользователь не найден'));
       }
     })
     .catch((err) => {
-      if (err.name === "ValidationError") {
-        next(new CastError("Переданы некорректные данные"));
+      if (err.name === 'ValidationError') {
+        next(new CastError('Переданы некорректные данные'));
       } else {
         next(err);
       }
@@ -77,18 +92,18 @@ module.exports.updateUserAvatar = (req, res, next) => {
   User.findByIdAndUpdate(
     req.user._id,
     { avatar },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   )
     .then((user) => {
       if (user) {
         res.send({ data: user });
       } else {
-        next(new NotFoundError("Пользователь не найден"));
+        next(new NotFoundError('Пользователь не найден'));
       }
     })
     .catch((err) => {
-      if (err.name === "ValidationError") {
-        next(new CastError("Переданы некорректные данные"));
+      if (err.name === 'ValidationError') {
+        next(new CastError('Переданы некорректные данные'));
       } else {
         next(err);
       }
@@ -97,12 +112,12 @@ module.exports.updateUserAvatar = (req, res, next) => {
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
-  User.findUserByCredentials({ email }).select('+password')
+  User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign(
         { _id: user._id },
         NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
-         { expiresIn: '7d'},
+        { expiresIn: '7d' },
       );
       res.send({ token });
     })
@@ -116,7 +131,7 @@ module.exports.getUserInfo = (req, res, next) => {
       if (user) {
         res.send({ data: user });
       } else {
-        next(new NotFoundError("Пользователь не найден"));
+        next(new NotFoundError('Пользователь не найден'));
       }
     })
     .catch(next);
