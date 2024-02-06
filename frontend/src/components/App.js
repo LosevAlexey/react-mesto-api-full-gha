@@ -40,13 +40,15 @@ function App() {
   const [email, setEmail] = React.useState(null);
 
   React.useEffect(() => {
+    if (!loggedIn) return;
+
     Promise.all([api.getUserInfo(), api.getInitialCards()])
       .then(([userInfo, initialCards]) => {
         setCurrentUser(userInfo.data);
         setCards(initialCards);
       })
       .catch((error) => console.error(`Ошибка - ${error}`));
-  }, []);
+  }, [loggedIn]);
 
   function handleCardLike(card) {
     const isLiked = card.likes.some((i) => i === currentUser._id);
@@ -105,7 +107,7 @@ function App() {
     api
       .addCardPlace(name, link)
       .then((newCard) => {
-        console.log(newCard)
+        console.log(newCard);
         setCards([newCard.data, ...cards]);
         closeAllPopups();
       })
@@ -160,8 +162,8 @@ function App() {
       .login(email, password)
 
       .then((res) => {
-        setLoggedIn(true);
         localStorage.setItem("jwt", res.token);
+        setLoggedIn(true);
         setEmail(email);
         navigate("/", { replace: true });
       })
