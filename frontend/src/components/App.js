@@ -97,7 +97,7 @@ function App() {
     api
       .changeAvatar(link)
       .then((user) => {
-        setCurrentUser(user);
+        setCurrentUser(user.data);
         closeAllPopups();
       })
       .catch((error) => console.error(`Ошибка - ${error}`));
